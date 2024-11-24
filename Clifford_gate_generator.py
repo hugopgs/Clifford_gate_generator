@@ -1,89 +1,86 @@
-from qiskit import QuantumCircuit
 import numpy as np
+from qiskit.circuit.library import UnitaryGate
 
 
-def random_clifford_gate():
-    idx = np.random.randint(0, 24)
-    clifford_gate = QuantumCircuit(1)
+def random_clifford_gate(idx=None):
+    """return a (random or not clifford gate) from the 1 qubit clifford gate set. 
+    if idx is None:
+        return a random clifford gate from the 1 qubit clifford gate set.
+    else:
+        return a specific clifford gate from the 1 qubit clifford gate set.
+    Args:
+        idx (int, o<= idx <24): the index of the wanted clifford gate set. Defaults to None.
+
+    Returns:
+        UnitaryGate object
+    """
+    X = np.array([[0,1],  [1,0]])
+    Y = np.array( [[0,-1j], [1j,0]])
+    Z = np.array( [[1,0],  [0,-1]])
+    I = np.array( [[1,0],  [0,1]])
+    S=np.array([[1,0],  [0,1j]])
+    H= np.array([[1/np.sqrt(2),1/np.sqrt(2)],  [1/np.sqrt(2),-1/np.sqrt(2)]])
+    V=H@S@H@S
+    W=V@V
+    if idx==None:
+        idx = np.random.randint(0,23)
+    if idx>=24:
+        print("idx out of range, idx need to be between 0 and 23")
     if idx == 0:
-        clifford_gate.id(0)                      # Identity
+        return UnitaryGate(I)                    
     elif idx == 1:
-        clifford_gate.x(0)                      # X
+         return UnitaryGate(X)                      
     elif idx == 2:
-        clifford_gate.y(0)                      # Y
+         return UnitaryGate(Y)                     
     elif idx == 3:
-        clifford_gate.z(0)                      # Z
+         return UnitaryGate(Z) 
     elif idx == 4:
-        clifford_gate.h(0)                      # H
+        return UnitaryGate(V)                  
     elif idx == 5:
-        clifford_gate.s(0)                      # S
+        return UnitaryGate(V@X)
     elif idx == 6:
-        clifford_gate.sdg(0)                    # S†
+        return UnitaryGate(V@Y)               
     elif idx == 7:
-        clifford_gate.h(0)
-        clifford_gate.s(0)                      # HS
+       return UnitaryGate(V@Z)
     elif idx == 8:
-        clifford_gate.h(0)
-        clifford_gate.sdg(0)                    # HS†
+        return UnitaryGate(W@X)             
     elif idx == 9:
-        clifford_gate.s(0)
-        clifford_gate.h(0)                      # SH
+        return UnitaryGate(W@Y)             
     elif idx == 10:
-        clifford_gate.sdg(0)
-        clifford_gate.h(0)                      # S†H
+        return UnitaryGate(W@Z)
     elif idx == 11:
-        clifford_gate.s(0)
-        clifford_gate.x(0)                      # SX
+        return UnitaryGate(H@X)
     elif idx == 12:
-        clifford_gate.s(0)
-        clifford_gate.y(0)                      # SY
+        return UnitaryGate(H@Y)
     elif idx == 13:
-        clifford_gate.s(0)
-        clifford_gate.z(0)                      # SZ
+        return UnitaryGate(H@Z)                     
     elif idx == 14:
-        clifford_gate.sdg(0)
-        clifford_gate.x(0)                      # S†X
+        return UnitaryGate(H)
     elif idx == 15:
-        clifford_gate.sdg(0)
-        clifford_gate.y(0)                      # S†Y
+        return UnitaryGate(H@V)                    
     elif idx == 16:
-        clifford_gate.sdg(0)
-        clifford_gate.z(0)                      # S†Z
+        return UnitaryGate(H@V@X)
     elif idx == 17:
-        clifford_gate.h(0)
-        clifford_gate.s(0)
-        clifford_gate.x(0)                      # HSX
+        return UnitaryGate(H@V@Y)       
     elif idx == 18:
-        clifford_gate.h(0)
-        clifford_gate.sdg(0)
-        clifford_gate.x(0)                      # HS†X
+        return UnitaryGate(H@V@Z)            
     elif idx == 19:
-        clifford_gate.h(0)
-        clifford_gate.s(0)
-        clifford_gate.y(0)                      # HSY
+        return UnitaryGate(H@W)     
     elif idx == 20:
-        clifford_gate.h(0)
-        clifford_gate.sdg(0)
-        clifford_gate.y(0)                      # HS†Y
+        return UnitaryGate(H@W@X)             
     elif idx == 21:
-        clifford_gate.h(0)
-        clifford_gate.s(0)
-        clifford_gate.z(0)                      # HSZ
+        return UnitaryGate(H@W@Y)                     
     elif idx == 22:
-        clifford_gate.h(0)
-        clifford_gate.sdg(0)
-        clifford_gate.z(0)                      # HS†Z
+        return UnitaryGate(H@W@Z)                
     elif idx == 23:
-        clifford_gate.h(0)
-        clifford_gate.y(0)        
-    return clifford_gate
+        return UnitaryGate(W)     
 
 
 
-def add_random_clifford(circuit: QuantumCircuit): 
-    Gate = []
-    for qubits in range(circuit.num_qubits): # add a random Clifford gates to each qubit
-        clifford_gate = random_clifford_gate()
-        Gate.append(clifford_gate)
-        circuit = circuit.compose(clifford_gate, [qubits])
-    return Gate, circuit # return the list of added gates and the updated circuit
+def add_random_clifford(circuit):
+    clifford_gate=[]
+    for qubits in range(circuit.num_qubits):
+        clifford_gate.append(random_clifford_gate())
+        circuit.append(clifford_gate[-1],[qubits])
+    circuit.measure_all()
+    return clifford_gate, circuit
