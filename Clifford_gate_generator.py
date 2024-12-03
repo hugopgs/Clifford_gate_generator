@@ -3,7 +3,7 @@ from qiskit.circuit.library import UnitaryGate
 
 
 def random_clifford_gate(idx=None):
-    """return a (random or not clifford gate) from the 1 qubit clifford gate set. 
+    """return a (random or not) clifford gate from the 1 qubit clifford gate set. 
     if idx is None:
         return a random clifford gate from the 1 qubit clifford gate set.
     else:
